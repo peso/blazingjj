@@ -128,34 +128,34 @@ fn main() -> Result<()> {
 
     // Setup environment
     let env = Env::new(path, args.revisions, jj_bin)?;
-    let mut commander = Commander::new(&env);
+    let commander = Commander::new(&env);
 
     if !args.ignore_jj_version {
         commander.check_jj_version()?;
     }
 
     // Setup app
-    let mut app = App::new(env.clone())?;
+    let mut app = App::new(env.clone(), commander)?;
 
     install_panic_hook();
     let mut terminal = setup_terminal()?;
 
     // Run app
-    let res = run_app(&mut terminal, &mut app, &mut commander);
+    let res = run_app(&mut terminal, &mut app);
     restore_terminal()?;
     res?;
 
     Ok(())
 }
 
-fn run_app(terminal: &mut DefaultTerminal, app: &mut App, commander: &mut Commander) -> Result<()> {
+fn run_app(terminal: &mut DefaultTerminal, app: &mut App) -> Result<()> {
     loop {
-        app.update(commander)?;
+        app.update()?;
         terminal.draw(|f| {
             let _ = ui(f, app);
         })?;
 
-        let should_stop = input_to_app(app, commander)?;
+        let should_stop = input_to_app(app)?;
 
         if should_stop {
             return Ok(());
@@ -166,7 +166,7 @@ fn run_app(terminal: &mut DefaultTerminal, app: &mut App, commander: &mut Comman
 /// Let app process all input events in queue before returning
 /// to draw the next frame.
 /// Return true if application should stop
-fn input_to_app(app: &mut App, commander: &mut Commander) -> Result<bool> {
+fn input_to_app(app: &mut App) -> Result<bool> {
     // Duration::MAX overflows the timespec struct used by kevent/kqueue on macOS,
     // causing EINVAL (os error 22). Use a safe large value instead.
     const FOREVER: Duration = Duration::from_secs(24 * 3600);
@@ -189,7 +189,7 @@ fn input_to_app(app: &mut App, commander: &mut Commander) -> Result<bool> {
     let mut should_stop: bool = false;
     while event::poll(Duration::ZERO)? && !should_stop {
         let event = event::read()?;
-        should_stop = app.input(event, commander)?;
+        should_stop = app.input(event)?;
     }
     Ok(should_stop)
 }
