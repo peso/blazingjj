@@ -211,7 +211,7 @@ impl Component for RebasePopup {
         Ok(())
     }
 
-    fn input(&mut self, _commander: &mut Commander, _event: Event) -> Result<ComponentInputResult> {
+    fn input(&mut self, _event: Event) -> Result<ComponentInputResult> {
         unreachable!();
         //return Ok(ComponentInputResult::Handled);
     }

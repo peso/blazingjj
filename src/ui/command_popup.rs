@@ -26,12 +26,14 @@ use crate::ui::message_popup::MessagePopup;
 use crate::ui::utils::centered_rect_line_height;
 
 pub struct CommandPopup<'a> {
+    commander: Commander,
     command_textarea: TextArea<'a>,
 }
 
 impl CommandPopup<'_> {
-    pub fn new() -> Self {
+    pub fn new(commander: Commander) -> Self {
         Self {
+            commander,
             command_textarea: TextArea::new(vec![]),
         }
     }
@@ -73,11 +75,8 @@ impl Component for CommandPopup<'_> {
         Ok(())
     }
 
-    fn input(
-        &mut self,
-        commander: &mut Commander,
-        event: Event,
-    ) -> anyhow::Result<ComponentInputResult> {
+    fn input(&mut self, event: Event) -> anyhow::Result<ComponentInputResult> {
+        let commander = &self.commander;
         if let Event::Key(key) = event {
             match key.code {
                 KeyCode::Enter => {
