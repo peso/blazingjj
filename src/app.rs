@@ -93,14 +93,13 @@ impl<'a> App<'a> {
     pub fn set_tab(&mut self, tab: Tab) -> Result<()> {
         info!("Setting tab to {}", tab);
         self.current_tab = tab;
-        let mut commander = self.commander.clone();
-        self.get_or_init_current_tab()?.focus(&mut commander)?;
+        self.get_or_init_current_tab()?.focus()?;
         Ok(())
     }
 
     pub fn get_log_tab(&mut self) -> Result<&mut LogTab<'a>> {
         if self.log.is_none() {
-            self.log = Some(LogTab::new(&mut self.commander)?);
+            self.log = Some(LogTab::new(self.commander.clone())?);
         }
 
         self.log
@@ -111,7 +110,7 @@ impl<'a> App<'a> {
     pub fn get_files_tab(&mut self) -> Result<&mut FilesTab> {
         if self.files.is_none() {
             let current_head = self.commander.get_current_head()?;
-            self.files = Some(FilesTab::new(&mut self.commander, &current_head)?);
+            self.files = Some(FilesTab::new(self.commander.clone(), &current_head)?);
         }
 
         self.files
@@ -121,7 +120,7 @@ impl<'a> App<'a> {
 
     pub fn get_bookmarks_tab(&mut self) -> Result<&mut BookmarksTab<'a>> {
         if self.bookmarks.is_none() {
-            self.bookmarks = Some(BookmarksTab::new(&mut self.commander)?);
+            self.bookmarks = Some(BookmarksTab::new(self.commander.clone())?);
         }
 
         self.bookmarks
@@ -155,18 +154,17 @@ impl<'a> App<'a> {
     }
 
     pub fn handle_action(&mut self, component_action: ComponentAction) -> Result<()> {
-        let mut commander = self.commander.clone();
         match component_action {
             ComponentAction::ViewFiles(head) => {
                 self.set_tab(Tab::Files)?;
-                self.get_files_tab()?.set_head(&mut commander, &head)?;
+                self.get_files_tab()?.set_head(&head)?;
             }
             ComponentAction::ViewLog(head) => {
-                self.get_log_tab()?.set_head(&mut commander, head);
+                self.get_log_tab()?.set_head(head);
                 self.set_tab(Tab::Log)?;
             }
             ComponentAction::ChangeHead(head) => {
-                self.get_files_tab()?.set_head(&mut commander, &head)?;
+                self.get_files_tab()?.set_head(&head)?;
             }
             ComponentAction::SetPopup(popup) => {
                 self.popup = popup;
@@ -179,9 +177,8 @@ impl<'a> App<'a> {
             ComponentAction::RefreshTab() => {
                 self.set_tab(self.current_tab)?;
                 if self.current_tab == Tab::Log {
-                    let mut commander = self.commander.clone();
-                    let head = commander.get_current_head()?.clone();
-                    self.get_log_tab()?.set_head(&mut commander, head);
+                    let head = self.commander.get_current_head()?.clone();
+                    self.get_log_tab()?.set_head(head);
                 };
             }
         }
@@ -191,14 +188,13 @@ impl<'a> App<'a> {
 
     #[instrument(level = "trace", skip(self))]
     pub fn update(&mut self) -> Result<()> {
-        let mut commander = self.commander.clone();
         if let Some(popup) = self.popup.as_mut()
-            && let Some(component_action) = popup.update(&mut commander)?
+            && let Some(component_action) = popup.update()?
         {
             self.handle_action(component_action)?;
         }
 
-        if let Some(component_action) = self.get_or_init_current_tab()?.update(&mut commander)? {
+        if let Some(component_action) = self.get_or_init_current_tab()?.update()? {
             self.handle_action(component_action)?;
         }
 
@@ -207,9 +203,8 @@ impl<'a> App<'a> {
 
     #[instrument(level = "trace", skip(self))]
     pub fn input(&mut self, event: Event) -> Result<bool> {
-        let mut commander = self.commander.clone();
         if let Some(popup) = self.popup.as_mut() {
-            match popup.input(&mut commander, event.clone())? {
+            match popup.input(event.clone())? {
                 ComponentInputResult::HandledAction(component_action) => {
                     self.handle_action(component_action)?
                 }
@@ -234,12 +229,9 @@ impl<'a> App<'a> {
                 }
             };
         } else if event == event::Event::FocusGained {
-            self.get_or_init_current_tab()?.focus(&mut commander)?;
+            self.get_or_init_current_tab()?.focus()?;
         } else {
-            match self
-                .get_or_init_current_tab()?
-                .input(&mut commander, event.clone())?
-            {
+            match self.get_or_init_current_tab()?.input(event.clone())? {
                 ComponentInputResult::HandledAction(component_action) => {
                     self.handle_action(component_action)?
                 }
@@ -275,7 +267,7 @@ impl<'a> App<'a> {
                         }
                         // General jj command runner
                         else if key.code == KeyCode::Char(':') {
-                            self.popup = Some(Box::new(CommandPopup::new()));
+                            self.popup = Some(Box::new(CommandPopup::new(self.commander.clone())));
                         }
                     }
                 }
