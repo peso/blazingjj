@@ -131,27 +131,27 @@ fn main() -> Result<()> {
 
     // Setup environment
     let env = Env::new(path, args.revisions, jj_bin)?;
-    let mut commander = Commander::new(&env);
+    let commander = Commander::new(&env);
 
     if !args.ignore_jj_version {
         commander.check_jj_version()?;
     }
 
     // Setup app
-    let mut app = App::new(env.clone())?;
+    let mut app = App::new(env.clone(), commander)?;
 
     install_panic_hook();
     let mut terminal = setup_terminal()?;
 
     // Run app
-    let res = run_app(&mut terminal, &mut app, &mut commander);
+    let res = run_app(&mut terminal, &mut app);
     restore_terminal()?;
     res?;
 
     Ok(())
 }
 
-fn run_app(terminal: &mut DefaultTerminal, app: &mut App, commander: &mut Commander) -> Result<()> {
+fn run_app(terminal: &mut DefaultTerminal, app: &mut App) -> Result<()> {
     let mut wait_duration = Duration::from_millis(0);
     loop {
         if event::poll(wait_duration)? {
@@ -163,14 +163,14 @@ fn run_app(terminal: &mut DefaultTerminal, app: &mut App, commander: &mut Comman
                 }) => continue,
                 event => {
                     app.stats.start_time = Instant::now();
-                    if app.input(event, commander)? {
+                    if app.input(event)? {
                         return Ok(());
                     }
                 }
             }
         }
 
-        app.update(commander)?;
+        app.update()?;
         terminal.draw(|f| {
             let _ = ui(f, app);
         })?;
