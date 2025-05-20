@@ -5,7 +5,6 @@ use std::fs::OpenOptions;
 use std::fs::canonicalize;
 use std::io::ErrorKind;
 use std::io::{self};
-use std::ops::Sub;
 use std::process::Command;
 use std::time::Duration;
 use std::time::Instant;
@@ -20,10 +19,7 @@ use ratatui::crossterm::event::DisableFocusChange;
 use ratatui::crossterm::event::DisableMouseCapture;
 use ratatui::crossterm::event::EnableFocusChange;
 use ratatui::crossterm::event::EnableMouseCapture;
-use ratatui::crossterm::event::Event;
 use ratatui::crossterm::event::KeyboardEnhancementFlags;
-use ratatui::crossterm::event::MouseEvent;
-use ratatui::crossterm::event::MouseEventKind;
 use ratatui::crossterm::event::PopKeyboardEnhancementFlags;
 use ratatui::crossterm::event::PushKeyboardEnhancementFlags;
 use ratatui::crossterm::event::{self};
@@ -153,59 +149,44 @@ fn main() -> Result<()> {
 }
 
 fn run_app(terminal: &mut DefaultTerminal, app: &mut App) -> Result<()> {
-    // Specify how long to wait for input.
-    // First loop is 0ms in to avoid starting with a blank screen.
-    let mut wait_duration = Duration::from_millis(0);
     loop {
-        // Input
-        let should_stop = input_to_app(app, wait_duration)?;
-
-        if should_stop {
-            return Ok(());
-        }
-
         app.update()?;
         terminal.draw(|f| {
             let _ = ui(f, app);
         })?;
 
-        // Allow popups like the fetch animation to update every 100ms, if there is no popup, just
-        // wait for an incoming event
-        wait_duration = if app.popup.is_none() {
-            Duration::MAX
-        } else {
-            Duration::from_millis(100)
-        };
+        let should_stop = input_to_app(app)?;
+
+        if should_stop {
+            return Ok(());
+        }
     }
 }
 
 /// Let app process all input events in queue before returning
+/// to draw the next frame.
 /// Return true if application should stop
-fn input_to_app(app: &mut App, wait_duration: Duration) -> Result<bool> {
-    let input_time_out = Instant::now() + wait_duration;
-    let event = loop {
-        let start_of_loop = Instant::now();
-        let remaining_wait_period = input_time_out.sub(start_of_loop);
-
-        // Return if no event arrives within the specified period
-        if !event::poll(remaining_wait_period)? {
-            return Ok(false);
-        }
-
-        // Process one event
-        match event::read()? {
-            event::Event::FocusLost => continue,
-            Event::Mouse(MouseEvent {
-                kind: MouseEventKind::Moved,
-                ..
-            }) => continue,
-            event => break event,
-        }
+fn input_to_app(app: &mut App) -> Result<bool> {
+    // Allow popups like the fetch animation to update every 100ms.
+    let wait_duration = if app.popup.is_some() {
+        Duration::from_millis(100)
+    } else {
+        Duration::MAX
     };
-
+    // If no event arrives, return and draw next frame.
+    let event_arrived = event::poll(wait_duration)?;
     app.stats.start_time = Instant::now();
-    let should_stop = app.input(event)?;
+    if !event_arrived {
+        return Ok(false);
+    }
 
+    // Handle all pending events in the queue.
+    // Stop if an event requested the app to stop.
+    let mut should_stop: bool = false;
+    while event::poll(Duration::ZERO)? && !should_stop {
+        let event = event::read()?;
+        should_stop = app.input(event)?;
+    }
     Ok(should_stop)
 }
 
