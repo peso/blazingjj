@@ -211,6 +211,7 @@ impl<'a> App<'a> {
         Ok(())
     }
 
+    /// Render the app to the ratatui frame
     #[instrument(level = "trace", skip(self, f))]
     pub fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()> {
         let chunks = Layout::default()
