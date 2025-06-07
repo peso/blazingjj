@@ -3,6 +3,7 @@ pub mod commit_show_cache;
 pub mod dialog;
 pub mod files_tab;
 pub mod log_tab;
+pub mod menu;
 pub mod panel;
 pub mod styles;
 pub mod utils;

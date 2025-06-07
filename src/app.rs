@@ -17,6 +17,9 @@ use ratatui::symbols;
 use ratatui::widgets::*;
 use tracing::info;
 use tracing::instrument;
+use tracing::trace;
+use tui_menu::Menu;
+use tui_menu::MenuState;
 
 use crate::commander::new_commander;
 use crate::env::get_env;
@@ -27,6 +30,7 @@ use crate::ui::bookmarks_tab::BookmarksTab;
 use crate::ui::dialog::CommandPopup;
 use crate::ui::files_tab::FilesTab;
 use crate::ui::log_tab::LogTab;
+use crate::ui::menu;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum Tab {
@@ -58,6 +62,8 @@ pub struct App<'a> {
     pub log: Option<LogTab<'a>>,
     pub files: Option<FilesTab>,
     pub bookmarks: Option<BookmarksTab<'a>>,
+
+    pub menu: MenuState<menu::Action>,
     pub popup: Option<Box<dyn Component>>,
     pub stats: Stats,
 }
@@ -69,6 +75,7 @@ impl<'a> App<'a> {
             log: None,
             files: None,
             bookmarks: None,
+            menu: menu::create(),
             popup: None,
             stats: Stats {
                 start_time: Instant::now(),
@@ -214,10 +221,18 @@ impl<'a> App<'a> {
     /// Render the app to the ratatui frame
     #[instrument(level = "trace", skip(self, f))]
     pub fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()> {
+        // TODO Add a status bar that shows context help and short curs
+        let [menu_area, body, _status] = Layout::vertical([
+            Constraint::Length(1),
+            Constraint::Fill(1),
+            Constraint::Length(1),
+        ])
+        .areas(area);
+
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(1)])
-            .split(area);
+            .split(body);
 
         let header_chunks = Layout::default()
             .direction(Direction::Horizontal)
@@ -263,6 +278,8 @@ impl<'a> App<'a> {
         if let Some(current_tab) = self.get_current_tab() {
             current_tab.draw(f, chunks[1])?;
         }
+
+        Menu::new().render(menu_area, f.buffer_mut(), &mut self.menu);
 
         if let Some(popup) = self.popup.as_mut() {
             popup.draw(f, area)?;
@@ -313,7 +330,21 @@ impl<'a> App<'a> {
             };
         } else if event == event::Event::FocusGained {
             self.get_or_init_current_tab()?.focus()?;
+        } else if menu::input(&mut self.menu, event.clone()) {
+            trace!("Let menu handle event");
+            for selected in menu::next_action(&mut self.menu) {
+                match selected {
+                    menu::Action::ViewLog => self.set_tab(Tab::Log)?,
+                    menu::Action::ViewFiles => self.set_tab(Tab::Files)?,
+                    menu::Action::ViewBookmarks => self.set_tab(Tab::Bookmarks)?,
+                    menu::Action::AppExit => return Ok(true),
+                    _ => {
+                        panic!("Menu selected unknown action: {:?}", selected)
+                    }
+                }
+            }
         } else {
+            trace!("Let current tab handle event");
             match self.get_or_init_current_tab()?.input(event.clone())? {
                 ComponentInputResult::HandledAction(app_action) => {
                     self.handle_action(app_action)?

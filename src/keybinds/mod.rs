@@ -105,6 +105,7 @@ impl FromStr for Shortcut {
             match s {
                 "ctrl" => modifiers |= KeyModifiers::CONTROL,
                 "shift" => modifiers |= KeyModifiers::SHIFT,
+                "alt" => modifiers |= KeyModifiers::ALT,
                 "space" => key = Some(KeyCode::Char(' ')),
                 "enter" => key = Some(KeyCode::Enter),
                 "esc" => key = Some(KeyCode::Esc),
