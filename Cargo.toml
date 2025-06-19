@@ -43,6 +43,10 @@ ratatui-textarea = "0.9.1"
 tui_confirm_dialog = "0.4.0"
 version-compare = "0.2.1"
 
+# Temporary link to local package. TODO: Remove before push
+[patch.crates-io]
+tui-menu = { path = '../../tui/tui-menu' }
+
 # Release build optimize size.
 # Run strip manually after build to reduce further.
 [profile.release]
