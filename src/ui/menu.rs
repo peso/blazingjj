@@ -18,6 +18,12 @@ pub enum Action {
     FileNew,
     FileOpen,
     FileRefresh,
+    ChangeDescribe,
+    ChangeEdit,
+    ChangeNew,
+    ChangeRebase,
+    ChangeSquash,
+    ChangeAbandon,
     ViewLog,
     ViewFiles,
     ViewBookmarks,
@@ -49,6 +55,18 @@ pub fn create() -> MenuState<Action> {
                 */
                 MenuItem::item("Refresh", Action::FileRefresh),
                 MenuItem::item("Exit", Action::AppExit),
+            ],
+        ),
+        MenuItem::group(
+            "Change",
+            vec![
+                MenuItem::item("Describe", Action::ChangeDescribe),
+                MenuItem::item("Edit", Action::ChangeEdit),
+                MenuItem::item("----", Action::FileNew),
+                MenuItem::item("New", Action::ChangeNew),
+                MenuItem::item("Rebase", Action::ChangeRebase),
+                MenuItem::item("Squash", Action::ChangeSquash),
+                MenuItem::item("Abandon", Action::ChangeAbandon),
             ],
         ),
         MenuItem::group(
