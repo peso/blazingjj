@@ -42,6 +42,42 @@ This has several different usages
 
 The status bar gives the user context relevant help.
 
+### Event handling (lazyjj)
+
+Mouse events are handled directly by the menu, but key events are more indirect.
+First, the application should define menu navigation keys. This means that the
+menu must get a map from key-events to menu-actions. The old design exposed 
+functions corresponding to menu actions, but this is more verbose in the
+application code and less flexible than having
+a handle_action function which can trigger all actions.
+
+### Event handling (move to tui-menu)
+
+Since the mapping is quite generic, it ought to be implemented in a separate
+crate, but at least it is isolated to module so it will be easy to extract.
+
+The menu has function
+    on_event(self, Event) -> Option<MenuAction>
+which uses the event-action map provided by the application if the event is a key,
+and uses 
+    self.on_mouse_event(Event) -> Option<MenuAction>
+if it is a mouse event.
+
+Application should do the following
+
+fn handle_event(event)
+    let Some(action) = menu.on_event(event) 
+    else { return; }
+    // Handle menu command
+    menu.handle_action(action);
+    // Check for selection event
+    for e in menu.drain_events() {
+    match e {
+        MenuEvent::Selected(item) => {
+            // handle selection
+        }
+    }
+
 ### Detailed Design
 
 The place to describe all new interfaces and interactions and how it plays into
