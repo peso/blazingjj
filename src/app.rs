@@ -8,12 +8,10 @@ use ratatui::crossterm::event::KeyCode;
 use ratatui::crossterm::event::KeyModifiers;
 use ratatui::crossterm::event::{self};
 use ratatui::layout::Constraint;
-use ratatui::layout::Direction;
 use ratatui::layout::Layout;
 use ratatui::prelude::*;
 use ratatui::style::Color;
 use ratatui::style::Style;
-use ratatui::symbols;
 use ratatui::widgets::*;
 use tracing::info;
 use tracing::instrument;
@@ -222,61 +220,22 @@ impl<'a> App<'a> {
     #[instrument(level = "trace", skip(self, f))]
     pub fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()> {
         // TODO Add a status bar that shows context help and short curs
-        let [menu_area, body, _status] = Layout::vertical([
+        let [menu_area, body_area, status_area] = Layout::vertical([
             Constraint::Length(1),
             Constraint::Fill(1),
             Constraint::Length(1),
         ])
         .areas(area);
 
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([Constraint::Length(3), Constraint::Min(1)])
-            .split(body);
-
-        let header_chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-            .split(chunks[0]);
-
         {
-            let tabs = Tabs::new(
-                Tab::VALUES
-                    .iter()
-                    .enumerate()
-                    .map(|(i, tab)| format!("[{}] {}", i + 1, tab)),
-            )
-            .block(
-                Block::bordered()
-                    .title(" Tabs ")
-                    .border_type(BorderType::Rounded),
-            )
-            .highlight_style(Style::default().bg(get_env().jj_config.highlight_color()))
-            .select(
-                Tab::VALUES
-                    .iter()
-                    .position(|tab| tab == &self.current_tab)
-                    .unwrap_or(0),
-            )
-            .divider(symbols::line::VERTICAL);
-
-            f.render_widget(tabs, header_chunks[0]);
-        }
-        {
-            let tabs = Paragraph::new("q: quit | ?: help | R: refresh | 1/2/3: change tab")
-                .fg(Color::DarkGray)
-                .block(
-                    Block::bordered()
-                        .title(" blazingjj ")
-                        .border_type(BorderType::Rounded)
-                        .fg(Color::default()),
-                );
-
-            f.render_widget(tabs, header_chunks[1]);
+            let status_text =
+                Paragraph::new("q: quit | ?: help | R: refresh | 1/2/3: change tab").fg(Color::Gray);
+    
+            f.render_widget(status_text, status_area);
         }
 
         if let Some(current_tab) = self.get_current_tab() {
-            current_tab.draw(f, chunks[1])?;
+            current_tab.draw(f, body_area)?;
         }
 
         {
