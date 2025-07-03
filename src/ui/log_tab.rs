@@ -882,6 +882,7 @@ impl Component for LogTab<'_> {
         action_set.insert(menu::Action::ChangeDescribe);
         action_set.insert(menu::Action::ChangeEdit);
         action_set.insert(menu::Action::ChangeNew);
+        action_set.insert(menu::Action::ChangeSquash);
     }
     fn handle_action(&mut self, action: &menu::Action) -> bool {
         // The current state is half baked. 
@@ -901,6 +902,7 @@ impl Component for LogTab<'_> {
         let app_action_result = match action {
             menu::Action::ChangeDescribe => self.handle_event(LogTabEvent::Describe),
             menu::Action::ChangeNew => self.handle_event(LogTabEvent::CreateNew { describe: false }),
+            menu::Action::ChangeSquash => self.handle_event(LogTabEvent::Squash { ignore_immutable: false }),
             _ => return false,
         };
         match app_action_result {
