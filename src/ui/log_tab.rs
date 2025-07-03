@@ -881,6 +881,7 @@ impl Component for LogTab<'_> {
     fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
         action_set.insert(menu::Action::ChangeDescribe);
         action_set.insert(menu::Action::ChangeEdit);
+        action_set.insert(menu::Action::ChangeNew);
     }
     fn handle_action(&mut self, action: &menu::Action) -> bool {
         // The current state is half baked. 
@@ -899,6 +900,7 @@ impl Component for LogTab<'_> {
         // - maybe replace LogTabEvent with GlobalAction(LogTabAction)
         let app_action_result = match action {
             menu::Action::ChangeDescribe => self.handle_event(LogTabEvent::Describe),
+            menu::Action::ChangeNew => self.handle_event(LogTabEvent::CreateNew { describe: false }),
             _ => return false,
         };
         match app_action_result {

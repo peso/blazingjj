@@ -374,6 +374,7 @@ impl<'a> App<'a> {
     pub fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
         action_set.insert(menu::Action::AppExit);
         action_set.insert(menu::Action::ChangeDescribe);
+        action_set.insert(menu::Action::ChangeNew);
         action_set.insert(menu::Action::ViewChanges);
         action_set.insert(menu::Action::ViewFiles);
         action_set.insert(menu::Action::ViewBookmarks);
