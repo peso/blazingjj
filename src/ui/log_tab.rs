@@ -879,6 +879,7 @@ impl Component for LogTab<'_> {
 
     /// Update action_set with actions that can be handled
     fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
+        action_set.insert(menu::Action::ChangeAbandon);
         action_set.insert(menu::Action::ChangeDescribe);
         action_set.insert(menu::Action::ChangeEdit);
         action_set.insert(menu::Action::ChangeNew);
@@ -900,6 +901,7 @@ impl Component for LogTab<'_> {
         // - probably eliminate LogTabEvent
         // - maybe replace LogTabEvent with GlobalAction(LogTabAction)
         let app_action_result = match action {
+            menu::Action::ChangeAbandon => self.handle_event(LogTabEvent::Abandon),
             menu::Action::ChangeDescribe => self.handle_event(LogTabEvent::Describe),
             menu::Action::ChangeNew => self.handle_event(LogTabEvent::CreateNew { describe: false }),
             menu::Action::ChangeSquash => self.handle_event(LogTabEvent::Squash { ignore_immutable: false }),
