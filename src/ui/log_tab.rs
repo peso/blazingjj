@@ -879,6 +879,7 @@ impl Component for LogTab<'_> {
 
     /// Update action_set with actions that can be handled
     fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
+        action_set.insert(menu::Action::ChangeDescribe);
         action_set.insert(menu::Action::ChangeEdit);
     }
     fn handle_action(&mut self, action: &menu::Action) -> bool {
