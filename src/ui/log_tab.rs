@@ -881,6 +881,7 @@ impl Component for LogTab<'_> {
     fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
         action_set.insert(menu::Action::ChangeAbandon);
         action_set.insert(menu::Action::ChangeDescribe);
+        action_set.insert(menu::Action::ChangeDuplicate);
         action_set.insert(menu::Action::ChangeEdit);
         action_set.insert(menu::Action::ChangeNew);
         action_set.insert(menu::Action::ChangeSquash);
@@ -903,6 +904,7 @@ impl Component for LogTab<'_> {
         let app_action_result = match action {
             menu::Action::ChangeAbandon => self.handle_event(LogTabEvent::Abandon),
             menu::Action::ChangeDescribe => self.handle_event(LogTabEvent::Describe),
+            menu::Action::ChangeDuplicate => self.handle_event(LogTabEvent::Duplicate),
             menu::Action::ChangeNew => self.handle_event(LogTabEvent::CreateNew { describe: false }),
             menu::Action::ChangeSquash => self.handle_event(LogTabEvent::Squash { ignore_immutable: false }),
             _ => return false,
