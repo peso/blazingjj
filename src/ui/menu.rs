@@ -15,22 +15,57 @@ use crate::keybinds::{Shortcut, keybinds_store::KeybindsStore};
 #[derive(Clone, Eq, PartialEq, Debug)]
 /// Application actions
 pub enum Action {
-    FileNew,
-    FileOpen,
-    FileRefresh,
+    AppPreferences,
+    AppExit,
+
+    RepoNew,
+    RepoOpen,
+    RepoClone,
+    RepoRefresh,
+    RepoFetch,
+    RepoPush,
+    RepoSparse,
+    RepoWorkspace,
+
+    OperationUndo, // jj undo = jj op undo one change
+    OperationRedo, // jj op restore the change just undone
+    OperationAbandon,
+    OperationInverse, // interactive jj operation undo
+    OperationRestore, // interactive restore
+
     ChangeDescribe,
     ChangeEdit,
     ChangeNew,
+    ChangeDuplicate,
+    ChangeParallelize,
+    ChangeSplit,
     ChangeRebase,
+    ChangeResolve,
     ChangeSquash,
+    ChangeAbsorb,
     ChangeAbandon,
-    ViewLog,
+    ChangeSign,
+    ChangeUnsign,
+
+    FileTrack,
+    FileUntrack,
+    FileRestore, // jj restore
+
+    ViewChanges,
     ViewFiles,
     ViewBookmarks,
-    ViewCommands,
-    AppExit,
-    AboutAuthor,
-    AboutHelp,
+    ViewAnnotate,
+    ViewChangeEvolution,
+    ViewOperations,
+    ViewWorkspaces,
+    ViewRemotes,
+    ViewTags,
+
+    HelpKeybindings,
+    HelpCLICommands,
+    HelpKeyword,
+    HelpReportIssue,
+    HelpAbout,
 }
 
 /**
@@ -39,50 +74,101 @@ pub enum Action {
 pub fn create() -> MenuState<Action> {
     MenuState::new(vec![
         MenuItem::group(
-            "File",
+            "Repo",
             vec![
-                MenuItem::item("New", Action::FileNew),
-                MenuItem::item("Open", Action::FileOpen),
+                MenuItem::item("New", Action::RepoNew),
+                MenuItem::item("Open", Action::RepoOpen),
                 /*
                 MenuItem::group(
                     "Open recent",
                         ["file_1.txt",
                          "file_2.txt"]
                         .iter()
-                        .map(|&f| MenuItem::item(f, Action::FileOpenRecent(f.into())))
+                        .map(|&f| MenuItem::item(f, Action::RepoOpenRecent(f.into())))
                         .collect(),
                 ),
                 */
-                MenuItem::item("Refresh", Action::FileRefresh),
+                MenuItem::item("Refresh", Action::RepoRefresh),
+                MenuItem::line(),
+                MenuItem::item("Clone", Action::RepoClone),
+                MenuItem::item("Fetch", Action::RepoFetch),
+                MenuItem::item("Push", Action::RepoPush),
+                MenuItem::line(),
+                MenuItem::item("Sparse..", Action::RepoSparse),
+                MenuItem::item("Workspace..", Action::RepoWorkspace),
+                MenuItem::line(),
+                MenuItem::item("Preferences..", Action::AppPreferences),
                 MenuItem::item("Exit", Action::AppExit),
+            ],
+        ),
+        MenuItem::group(
+            "Operation",
+            vec![
+                MenuItem::item("Undo", Action::OperationUndo),
+                MenuItem::item("Redo", Action::OperationRedo),
+                MenuItem::line(),
+                MenuItem::item("Diff", Action::OperationAbandon),
+                MenuItem::item("Restore", Action::OperationRestore),
+                MenuItem::item("Inverse", Action::OperationInverse),
+                MenuItem::item("Abandon", Action::OperationAbandon),
             ],
         ),
         MenuItem::group(
             "Change",
             vec![
-                MenuItem::item("Describe", Action::ChangeDescribe),
-                MenuItem::item("Edit", Action::ChangeEdit),
-                MenuItem::item("----", Action::FileNew),
                 MenuItem::item("New", Action::ChangeNew),
-                MenuItem::item("Rebase", Action::ChangeRebase),
+                MenuItem::item("Duplicate", Action::ChangeDuplicate),
+                MenuItem::item("Parallelize", Action::ChangeParallelize),
+                MenuItem::item("Split", Action::ChangeSplit),
+                MenuItem::line(),
+                MenuItem::item("Edit", Action::ChangeEdit),
+                MenuItem::item("Describe..", Action::ChangeDescribe),
+                MenuItem::item("Rebase..", Action::ChangeRebase),
+                MenuItem::item("Resolve..", Action::ChangeResolve),
+                MenuItem::line(),
+                MenuItem::item("Revert..", Action::RepoPush),
                 MenuItem::item("Squash", Action::ChangeSquash),
+                MenuItem::item("Absorb", Action::ChangeAbsorb),
                 MenuItem::item("Abandon", Action::ChangeAbandon),
+                MenuItem::line(),
+                MenuItem::item("Sign", Action::ChangeSign),
+                MenuItem::item("Unsign", Action::ChangeUnsign),
+                MenuItem::line(),
+                MenuItem::item("Find..", Action::HelpAbout),
+            ],
+        ),
+        MenuItem::group(
+            "File",
+            vec![
+                MenuItem::item("Track", Action::FileTrack),
+                MenuItem::item("Untrack", Action::FileUntrack),
+                MenuItem::item("Restore..", Action::FileRestore),
             ],
         ),
         MenuItem::group(
             "View",
             vec![
-                MenuItem::item("Log", Action::ViewLog),
                 MenuItem::item("Files", Action::ViewFiles),
+                MenuItem::item("Annotate file", Action::ViewAnnotate),
+                MenuItem::line(),
+                MenuItem::item("Changes", Action::ViewChanges),
+                MenuItem::item("Change evolution", Action::ViewChangeEvolution),
+                MenuItem::item("Operations", Action::ViewOperations),
+                MenuItem::line(),
+                MenuItem::item("Workspaces", Action::ViewWorkspaces),
+                MenuItem::item("Remotes", Action::ViewRemotes),
                 MenuItem::item("Bookmarks", Action::ViewBookmarks),
-                MenuItem::item("Commands", Action::ViewCommands),
+                MenuItem::item("Tags", Action::ViewTags),
             ],
         ),
         MenuItem::group(
-            "About",
+            "Help",
             vec![
-                MenuItem::item("Author", Action::AboutAuthor),
-                MenuItem::item("Help", Action::AboutHelp),
+                MenuItem::item("Keybindings", Action::HelpKeybindings),
+                MenuItem::item("CLI Commands", Action::HelpCLICommands),
+                MenuItem::item("Keywords", Action::HelpKeyword),
+                MenuItem::item("Report issue", Action::HelpReportIssue),
+                MenuItem::item("About", Action::HelpAbout),
             ],
         ),
     ])

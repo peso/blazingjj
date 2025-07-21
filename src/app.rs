@@ -298,7 +298,7 @@ impl<'a> App<'a> {
             trace!("Let menu handle event");
             for selected in menu::next_action(&mut self.menu) {
                 match selected {
-                    menu::Action::ViewLog => self.set_tab(Tab::Log)?,
+                    menu::Action::ViewChanges => self.set_tab(Tab::Log)?,
                     menu::Action::ViewFiles => self.set_tab(Tab::Files)?,
                     menu::Action::ViewBookmarks => self.set_tab(Tab::Bookmarks)?,
                     menu::Action::AppExit => return Ok(true),
