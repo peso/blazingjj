@@ -9,6 +9,7 @@ until it is closed.
 
 mod bookmark_set;
 mod command;
+mod describe;
 mod help;
 mod loader;
 mod message;
@@ -16,6 +17,7 @@ mod rebase;
 
 pub use bookmark_set::BookmarkSetPopup;
 pub use command::CommandPopup;
+pub use describe::DescribeDialog;
 pub use help::HelpPopup;
 pub use loader::LoaderPopup;
 pub use message::MessagePopup;

@@ -184,6 +184,9 @@ impl<'a> App<'a> {
             AppAction::RefreshTab() => {
                 self.set_tab(self.current_tab)?;
                 if self.current_tab == Tab::Log {
+                    // TODO should this be get_head_latest instead?
+                    // Eg. the Describe dialog will add a newer revision
+                    // of the current changeset.
                     let head = new_commander().get_current_head()?.clone();
                     self.get_log_tab()?.set_head(head);
                 };

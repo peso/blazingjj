@@ -12,7 +12,7 @@ use ratatui::crossterm::event::KeyEvent;
 use ratatui::crossterm::event::KeyModifiers;
 
 mod config;
-mod keybinds_store;
+pub mod keybinds_store;
 mod log_tab;
 mod message_popup;
 pub mod rebase_popup;
