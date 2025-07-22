@@ -62,6 +62,7 @@ pub struct App<'a> {
     pub bookmarks: Option<BookmarksTab<'a>>,
 
     pub menu: MenuState<menu::Action>,
+    /// Holds a modal popup. When present, it will consume all input events.
     pub popup: Option<Box<dyn Component>>,
     pub stats: Stats,
 }
@@ -164,7 +165,7 @@ impl<'a> App<'a> {
     }
 
     /// When a component wants the app to do something,
-    /// it sends a AppAction which the App handles.
+    /// it sends an AppAction which the App handles.
     pub fn handle_action(&mut self, app_action: AppAction) -> Result<()> {
         match app_action {
             AppAction::ViewFiles(head) => {
