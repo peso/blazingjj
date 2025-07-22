@@ -7,4 +7,6 @@ Once launched, a dialog will recieve all input events from the App,
 until it is closed.
 */
 
+mod bookmark_set;
 
+pub use bookmark_set::BookmarkSetPopup;
