@@ -26,7 +26,7 @@ use crate::env::JjConfig;
 use crate::ui::Component;
 use crate::ui::ComponentAction;
 use crate::ui::dialog::HelpPopup;
-use crate::ui::message_popup::MessagePopup;
+use crate::ui::dialog::MessagePopup;
 use crate::ui::panel::DetailsPanel;
 use crate::ui::panel::TextContent;
 use crate::ui::utils::centered_rect;
