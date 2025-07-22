@@ -279,7 +279,12 @@ impl<'a> App<'a> {
             current_tab.draw(f, chunks[1])?;
         }
 
-        Menu::new().render(menu_area, f.buffer_mut(), &mut self.menu);
+        {
+            let mut menu = Menu::new();
+            menu.highlight_item_style = 
+                Style::new().bg(get_env().jj_config.highlight_color());
+            menu.render(menu_area, f.buffer_mut(), &mut self.menu);
+        }
 
         if let Some(popup) = self.popup.as_mut() {
             popup.draw(f, area)?;

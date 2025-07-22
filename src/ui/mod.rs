@@ -58,3 +58,4 @@ pub trait Component {
 
     fn input(&mut self, event: Event) -> Result<ComponentInputResult>;
 }
+
