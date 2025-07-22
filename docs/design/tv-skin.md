@@ -51,6 +51,28 @@ functions corresponding to menu actions, but this is more verbose in the
 application code and less flexible than having
 a handle_action function which can trigger all actions.
 
+The general event flow is that the app captures an event (mouse or keyboard),
+and then sends it to all active layers in z order, top-down. As soon
+as the event is marked as handled, the propagation stops.
+
+The layers are hardcoded as
+1. global shortcuts
+2. menu (optional)
+3. pop-up (optional)
+4. tabs
+
+To start out simple, all optional layers are modal. This means that as soon as
+the layer is present, it will handle all events even those it has no action to.
+
+Global shortcut examples: exit, help
+
+Tabs may have their own shortcuts.
+Example: Log tab has 'd' for describe, which is also in the menu.
+
+
+
+Remember the rendering order of layers is bottom-up.
+
 ### Event handling (move to tui-menu)
 
 Since the mapping is quite generic, it ought to be implemented in a separate
@@ -83,7 +105,7 @@ fn handle_event(event)
 The menu is like the information architecture for a website: It gives
 a structure to all the actions the application can take.
 
-This is the menu structure
+This is the menu structure for lazyjj
 
   Repo   - aka repository
     New     - jj git init
@@ -279,11 +301,6 @@ These are the commands that jj version 0.30.0 has
 
 
 
-### Detailed Design
-
-The place to describe all new interfaces and interactions and how it plays into
-the existing code and behavior. This is the place for all nitty-gritty details
-which interact with the system.
 
 ## Alternatives considered (optional)
 
