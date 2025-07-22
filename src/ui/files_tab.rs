@@ -19,7 +19,7 @@ use crate::env::DiffFormat;
 use crate::env::JjConfig;
 use crate::ui::Component;
 use crate::ui::ComponentAction;
-use crate::ui::help_popup::HelpPopup;
+use crate::ui::dialog::HelpPopup;
 use crate::ui::message_popup::MessagePopup;
 use crate::ui::panel::DetailsPanel;
 use crate::ui::panel::TextContent;
