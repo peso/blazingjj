@@ -1,4 +1,5 @@
 use core::fmt;
+use std::collections::HashSet;
 use std::time::Instant;
 
 use anyhow::Result;
@@ -220,6 +221,9 @@ impl<'a> App<'a> {
     /// Render the app to the ratatui frame
     #[instrument(level = "trace", skip(self, f))]
     pub fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()> {
+        let mut enabled_actions = HashSet::<menu::Action>::new();
+        self.active_actions(&mut enabled_actions);
+
         // TODO Add a status bar that shows context help and short curs
         let [menu_area, body_area, status_area] = Layout::vertical([
             Constraint::Length(1),
@@ -237,7 +241,10 @@ impl<'a> App<'a> {
 
         if let Some(current_tab) = self.get_current_tab() {
             current_tab.draw(f, body_area)?;
+            current_tab.active_actions(&mut enabled_actions);
         }
+
+        menu::enable_actions(&mut self.menu, &enabled_actions);
 
         {
             let mut menu = Menu::new();
@@ -354,5 +361,12 @@ impl<'a> App<'a> {
         }
 
         Ok(false)
+    }
+
+    pub fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
+        action_set.insert(menu::Action::AppExit);
+        action_set.insert(menu::Action::ViewChanges);
+        action_set.insert(menu::Action::ViewFiles);
+        action_set.insert(menu::Action::ViewBookmarks);
     }
 }

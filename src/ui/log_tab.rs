@@ -1,4 +1,7 @@
 #![expect(clippy::borrow_interior_mutable_const)]
+
+use std::collections::HashSet;
+
 use anyhow::Result;
 use ratatui::crossterm::clipboard::CopyToClipboard;
 use ratatui::crossterm::event::Event;
@@ -34,6 +37,7 @@ use crate::ui::dialog::HelpPopup;
 use crate::ui::dialog::LoaderPopup;
 use crate::ui::dialog::MessagePopup;
 use crate::ui::dialog::RebasePopup;
+use crate::ui::menu;
 use crate::ui::panel::DetailsPanel;
 use crate::ui::panel::LargeStringContent;
 use crate::ui::panel::LogPanel;
@@ -870,5 +874,11 @@ impl Component for LogTab<'_> {
         }
 
         Ok(ComponentInputResult::Handled)
+    }
+
+
+    /// Update action_set with actions that can be handled
+    fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
+        action_set.insert(menu::Action::ChangeEdit);
     }
 }

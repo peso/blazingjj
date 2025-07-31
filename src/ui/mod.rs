@@ -7,6 +7,9 @@ pub mod menu;
 pub mod panel;
 pub mod styles;
 pub mod utils;
+
+use std::collections::HashSet;
+
 use anyhow::Result;
 use ratatui::Frame;
 use ratatui::crossterm::event::Event;
@@ -57,5 +60,9 @@ pub trait Component {
     fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()>;
 
     fn input(&mut self, event: Event) -> Result<ComponentInputResult>;
+
+    /// Update action set with the actions that component can handle
+    fn active_actions(&self, _action_set: &mut HashSet<menu::Action>) {
+    }
 }
 

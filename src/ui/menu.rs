@@ -3,6 +3,7 @@ The user can use the menu to discover and execute actions
 in lazyjj.
 
 */
+use std::collections::HashSet;
 use std::str::FromStr;
 
 use ratatui::crossterm::event::Event;
@@ -12,7 +13,7 @@ use tui_menu::{MenuAction, MenuEvent, MenuItem, MenuState};
 use crate::keybinds::{Shortcut, keybinds_store::KeybindsStore};
 
 // TODO: Move to ui/actions.rs and include sub-actions as defined by tabs
-#[derive(Clone, Eq, PartialEq, Debug)]
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
 /// Application actions
 pub enum Action {
     AppPreferences,
@@ -252,4 +253,18 @@ pub fn next_action(menu: &mut MenuState<Action>) -> Vec<Action> {
         }
     }
     result
+}
+
+/// Update menu items with actions, so they are enabled iff
+/// the action is in the actions set.
+pub fn enable_actions(
+    menu: &mut MenuState<Action>,
+    actions: &HashSet<Action>,
+) {
+    for mir in menu.iter() {
+        let mut menu_item = mir.borrow_mut();
+        if let Some(act) = &menu_item.data {
+            menu_item.enabled = actions.contains(act);
+        }
+    }
 }
