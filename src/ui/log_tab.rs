@@ -881,4 +881,7 @@ impl Component for LogTab<'_> {
     fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
         action_set.insert(menu::Action::ChangeEdit);
     }
+    fn handle_action(&mut self, _action: &menu::Action) -> bool {
+        false
+    }
 }

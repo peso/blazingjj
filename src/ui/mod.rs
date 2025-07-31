@@ -64,5 +64,10 @@ pub trait Component {
     /// Update action set with the actions that component can handle
     fn active_actions(&self, _action_set: &mut HashSet<menu::Action>) {
     }
+
+    /// Perform the provided action. Return true if handled
+    fn handle_action(&mut self, _action: &menu::Action) -> bool {
+        false
+    }
 }
 
