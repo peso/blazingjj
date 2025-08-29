@@ -206,16 +206,20 @@ pub fn input(menu: &mut MenuState<Action>, event: Event) -> bool {
     let event_name = event.clone();
     let action = match event {
         Event::Key(key_event) => {
-            let Some(key_action) = keybinds().match_event(key_event) else {
-                return false;
+            let Some(key_action) = keybinds().match_event(key_event)
+            else {
+                // Consume unknown key events when menu is active
+                return menu.is_active();
             };
             key_action
         },
         Event::Mouse(mouse_event) => {
             let handled = menu.on_mouse_event(&mouse_event);
-            // drain event from mouse action must be done
+            // Note: drain event from mouse action must be done
             // by calling menu::next_action
-            return handled;
+
+            // Consume unkonwn mouse events when menu is active
+            return handled || menu.is_active();
         },
         _ => {
             trace!("menu passes on event {:?} ::", event_name);
