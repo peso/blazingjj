@@ -59,6 +59,7 @@ pub trait Component {
 
     fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()>;
 
+    /// Try to handle user event
     fn input(&mut self, event: Event) -> Result<ComponentInputResult>;
 
     /// Update action set with the actions that component can handle
