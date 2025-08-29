@@ -311,7 +311,15 @@ impl<'a> App<'a> {
                     menu::Action::ViewBookmarks => self.set_tab(Tab::Bookmarks)?,
                     menu::Action::AppExit => return Ok(true),
                     _ => {
-                        panic!("Menu selected unknown action: {:?}", selected)
+                        trace!("Send menu action to current tab");
+                        let handled = self.get_tab(self.current_tab).unwrap()
+                            .handle_action(&selected);
+                        if !handled {
+                            let msg = format!("Action {:?} was not handled by current tab",
+                                &selected);
+                            tracing::error!("{}", msg);
+                            panic!("{}", msg);
+                        }
                     }
                 }
             }

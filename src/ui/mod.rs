@@ -17,7 +17,7 @@ use ratatui::layout::Rect;
 
 use crate::commander::log::Head;
 
-/// Action commmands from component to application
+/// Action commmands to application
 pub enum AppAction {
     ViewFiles(Head),
     ViewLog(Head),

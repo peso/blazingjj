@@ -881,7 +881,28 @@ impl Component for LogTab<'_> {
     fn active_actions(&self, action_set: &mut HashSet<menu::Action>) {
         action_set.insert(menu::Action::ChangeEdit);
     }
-    fn handle_action(&mut self, _action: &menu::Action) -> bool {
-        false
+    fn handle_action(&mut self, action: &menu::Action) -> bool {
+        // The current state is half baked. 
+        // The old code uses handle_input -> AppActrion
+        // The new code uses handle_action -> bool
+        // During transition, handle_action will simply forward to
+        // handle_input, but this only works if the LogTabEvent does
+        // not return an ComponentInputResult::HandledAction which
+        // must be processed by the app
+        //
+        // The future setup will
+        // - remove handle_input
+        // - allow handle_action to return ComponentInputResult
+        // - possibly disallow LogTabEvent with parameters
+        // - probably eliminate LogTabEvent
+        // - maybe replace LogTabEvent with GlobalAction(LogTabAction)
+        let app_action_result = match action {
+            menu::Action::ChangeDescribe => self.handle_event(LogTabEvent::Describe),
+            _ => return false,
+        };
+        match app_action_result {
+            Ok(ComponentInputResult::Handled) => return true,
+            _ => panic!("tab did not fully handle event"),
+        }
     }
 }
