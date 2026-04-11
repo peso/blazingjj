@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix Describe dialog width at git recommendation for commit message
 - Log tab diff is cached
 - Process multiple events per frame
+- Go to top and bottom of visible log
 
 ### Fixed
 
