@@ -105,6 +105,7 @@ impl<'a, T: Into<Text<'a>>> From<T> for TextContent<'a> {
 
 impl<'a> DetailContent<'a> for LargeStringContent<'a> {
     fn render_as_paragraph(&self, panel: &mut DetailsPanel, area: Rect) -> Paragraph<'_> {
+        panel.content_rect = area;
         // Update total length. This is used by the scroll bar
         panel.lines = self.large_string.lines() as u16;
         // Extract visible part of content
