@@ -109,6 +109,8 @@ impl FromStr for Shortcut {
                 "right" => key = Some(KeyCode::Right),
                 "up" => key = Some(KeyCode::Up),
                 "down" => key = Some(KeyCode::Down),
+                "home" => key = Some(KeyCode::Home),
+                "end" => key = Some(KeyCode::End),
                 s if s.starts_with('f') && s.chars().count() > 1 => {
                     let s = s.trim_start_matches('f');
                     match s.parse::<u8>() {

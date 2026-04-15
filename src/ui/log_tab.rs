@@ -417,6 +417,8 @@ impl<'a> LogTab<'a> {
             | LogTabEvent::ScrollUp
             | LogTabEvent::ScrollDownHalf
             | LogTabEvent::ScrollUpHalf
+            | LogTabEvent::ScrollToBottom
+            | LogTabEvent::ScrollToTop
             | LogTabEvent::ToggleHeadMark => {
                 self.log_panel.handle_event(commander, log_tab_event)?;
                 self.sync_head_output(commander);

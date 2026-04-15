@@ -26,6 +26,8 @@ pub enum LogTabEvent {
     ScrollUp,
     ScrollDownHalf,
     ScrollUpHalf,
+    ScrollToBottom,
+    ScrollToTop,
 
     FocusCurrent,
     ToggleHeadMark,
@@ -78,6 +80,8 @@ impl Default for LogTabKeybinds {
             LogTabEvent::ScrollUp => "up",
             LogTabEvent::ScrollDownHalf => "shift+j",
             LogTabEvent::ScrollUpHalf => "shift+k",
+            LogTabEvent::ScrollToBottom => "ctrl+end",
+            LogTabEvent::ScrollToTop => "ctrl+home",
             LogTabEvent::FocusCurrent => "@",
             LogTabEvent::ToggleHeadMark => "space",
             // todo: move to DetailsKeybindings

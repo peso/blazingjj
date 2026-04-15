@@ -345,6 +345,12 @@ impl<'a> LogPanel<'a> {
                     (self.visible_heads() as isize / 2).saturating_neg(),
                 );
             }
+            LogTabEvent::ScrollToBottom => {
+                self.scroll_relative(commander, isize::MAX);
+            }
+            LogTabEvent::ScrollToTop => {
+                self.scroll_relative(commander, -isize::MAX);
+            }
             LogTabEvent::ToggleHeadMark => {
                 self.toggle_head_mark();
             }
